@@ -1,4 +1,4 @@
-// import {userListenerLogin} from "./login_script.js";
+
 
 let token = window.sessionStorage.getItem("token");
 console.log("token", token);
@@ -6,32 +6,13 @@ console.log("token", token);
 
 if (token !== null) {
     import("./modal.js").then(module => {
-        const { createModal } = module;
-
-        const blockLink = document.createElement("div");
-        blockLink.classList.add("admin-block"); // Tu peux styliser ce bloc en CSS
-
-        const adminLink = document.createElement("a");
-        adminLink.innerText = "Modifier";
-        adminLink.href = "#";
-        adminLink.classList.add("admin-link");
-        adminLink.addEventListener("click", (e) => {
-            e.preventDefault();
-            createModal();
-        });
-
-        const infoLink = document.createElement("i");
-        infoLink.classList.add("fa-solid", "fa-pen-to-square");
-
-        blockLink.appendChild(infoLink);
-        blockLink.appendChild(adminLink);
-
-        const sectionWorks = document.querySelector("#portfolio");
-        if (sectionWorks) {
-            sectionWorks.appendChild(blockLink);
-        }
+        const { adminMode } = module;
+        adminMode();
+    }).catch(error => {
+        console.error("Erreur lors du chargement du module modal.js :", error);
     });
 }
+
 
 
 

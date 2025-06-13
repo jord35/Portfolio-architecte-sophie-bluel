@@ -325,3 +325,78 @@ section#portfolio {
 	align-items: center;
 	flex-direction: column;
 }
+
+/* ---------------------------------modal--------------------------- */
+.modal {
+	position: fixed;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-wrapper {
+	overflow-x: hidden;
+	overflow-y: auto;
+	width: 60%;
+	height: 60%;
+	max-width: calc(100vw - 20px);
+	max-height: calc(100vh - 20px);
+	padding: 20px;
+	background-color: white;
+
+
+
+}
+
+/* ________________________ */
+
+/* Conteneur glissant */
+.slide-container {
+	display: flex;
+	width: 200%;
+	transition: transform 0.5s ease-in-out;
+}
+
+/* Chaque panneau 50% dde 200%*/
+.slide {
+	width: 50%;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+/* État affichant le formulaire */
+.slide-container.show-form {
+	transform: translateX(-50%);
+}
+
+/* État initial : galerie */
+.slide-container.show-gallery {
+	transform: translateX(0%);
+}
+
+
+
+
+button.js-switch-to-form:hover,
+button.js-switch-to-gallery:hover {
+	background-color: #555;
+}
+
+.modal-img {
+	height: 100%;
+	width: 100%;
+	object-fit: cover;
+}
+
+.modal-works {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 10px;
+	padding: 10px;
+	align-items: start;
+}

@@ -1,19 +1,15 @@
+import { getWorks, getCategories, deleteWork, addWork } from "./api.js";
+import { afficherWorks } from "./script.js";
 
+export async function adminMode() {
+  const categories = await getCategories();
 
-import { getWorks, getCategories } from "./api.js";
-
-const works = await getWorks();
-const categories = await getCategories();
-
-
-
-export function adminMode() {
   const modalForAdmin = document.createElement("div");
   modalForAdmin.classList.add("modalForAdmin");
 
   modalForAdmin.innerHTML = `
-    <a href="#modal1" class="js-modal">Ouvrir la boîte modal</a>
-    <aside id="modal1" class="modal" aria-hidden="true" role="dialog" aria-labelledby="titlemodal" style="display:none;">
+    <a href="#modal" class="js-modal">Ouvrir la boîte modal</a>
+    <aside id="modal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="titlemodal" style="display:none;">
       <div class="modal-wrapper js-modal-stop">
         <button class="js-modal-close">Fermer la boîte modal</button>
         <h2 id="titlemodal">Galerie photo</h2>
@@ -34,22 +30,52 @@ export function adminMode() {
 
   document.getElementById("portfolio").appendChild(modalForAdmin);
 
-  const modal = document.getElementById("modal1");
-  const closeButton = modal.querySelector(".js-modal-close");
-  const openLink = modalForAdmin.querySelector(".js-modal");
+  const modal = document.getElementById("modal");
+  const openModalBtn = modalForAdmin.querySelector(".js-modal");
+  const closeModalBtn = modal.querySelector(".js-modal-close");
   const modalWorks = modal.querySelector(".js-modal-works");
   const slideContainer = modal.querySelector(".slide-container");
 
-  openLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    modal.style.display = null
-    modal.setAttribute("aria-hidden", "false");
-    modal.setAttribute("aria-modal", "true")
-  });
+  const stopPropagation = function (e) {
+    e.stopPropagation();
+  };
 
-  closeButton.addEventListener("click", () => {
+  function openModal(e) {
+    e.preventDefault();
+    modal.style.display = null;
+    modal.removeAttribute("aria-hidden");
+    modal.setAttribute("aria-modal", "true");
+    modal.addEventListener("click", closeModal);
+    closeModalBtn.addEventListener("click", closeModal);
+    modal.querySelector(".js-modal-stop").addEventListener("click", stopPropagation);
+
+    // Charger les projets dans la modale
+    getWorks().then(works => {
+      afficherModalWorks(works);
+    });
+  }
+
+  function closeModal(e) {
+    e.preventDefault();
     modal.style.display = "none";
     modal.setAttribute("aria-hidden", "true");
+    modal.removeAttribute("aria-modal");
+    modal.removeEventListener("click", closeModal);
+    closeModalBtn.removeEventListener("click", closeModal);
+    modal.querySelector(".js-modal-stop").removeEventListener("click", stopPropagation);
+
+    // Recharger les projets dans la galerie principale
+    getWorks().then(nouvellesWorks => {
+      afficherWorks(nouvellesWorks);
+    });
+  }
+
+  openModalBtn.addEventListener("click", openModal);
+
+  window.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" || e.key === "Esc") {
+      closeModal(e);
+    }
   });
 
   const switchToFormBtn = modal.querySelector(".js-switch-to-form");
@@ -73,8 +99,8 @@ export function adminMode() {
       const imageElement = document.createElement("img");
       imageElement.src = work.imageUrl;
       imageElement.alt = work.title;
-      workElement.classList.add("test")
-      imageElement.classList.add("modal-img")
+      imageElement.classList.add("modal-img");
+      workElement.classList.add("test");
 
       const trash = document.createElement("i");
       trash.classList.add("fa-solid", "fa-trash");
@@ -87,23 +113,14 @@ export function adminMode() {
           alert("Vous devez être connecté pour supprimer une image.");
           return;
         }
+        const success = await deleteWork(work.id, token);
 
-        try {
-          const response = await fetch(`http://localhost:5678/api/works/${work.id}`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (response.ok) {
-            workElement.remove();
-          } else {
-            alert("Erreur lors de la suppression de l’image.");
-          }
-        } catch (error) {
-          console.error("Erreur réseau :", error);
+        if (success) {
+          workElement.remove();
+        } else {
+          alert("Erreur lors de la suppression de l’image.");
         }
+
       });
 
       workElement.appendChild(imageElement);
@@ -111,8 +128,6 @@ export function adminMode() {
       modalWorks.appendChild(workElement);
     }
   }
-
-  afficherModalWorks(works);
 
   const addPicture = modal.querySelector(".js-add-picture");
   addPicture.innerHTML = `
@@ -128,9 +143,9 @@ export function adminMode() {
       </div>
       <div>
         <label for="category">Catégorie :</label>
-       <select id="category" name="category" required>
-        ${categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join("")}
-      </select>
+        <select id="category" name="category" required>
+          ${categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join("")}
+        </select>
       </div>
       <button type="submit">Valider</button>
     </form>
@@ -156,27 +171,16 @@ export function adminMode() {
     formData.append("title", titleInput.value);
     formData.append("category", categorySelect.value);
 
-    try {
-      const response = await fetch("http://localhost:5678/api/works", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+    const newWork = await addWork(formData, token);
 
-      if (response.ok) {
-        const newWork = await response.json();
-        works.push(newWork);
-        afficherModalWorks(works);
-        form.reset();
-        alert("Image ajoutée avec succès !");
-      } else {
-        alert("Erreur lors de l'ajout de l'image.");
-      }
-    } catch (err) {
-      console.error("Erreur réseau :", err);
-      alert("Échec de l'envoi. Vérifiez votre connexion.");
+    if (newWork) {
+      const updatedWorks = await getWorks();
+      afficherModalWorks(updatedWorks);
+      afficherWorks(updatedWorks);
+      form.reset();
+      alert("Image ajoutée avec succès !");
+    } else {
+      alert("Erreur lors de l'ajout de l'image.");
     }
-  });
+  })
 }

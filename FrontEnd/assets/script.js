@@ -1,9 +1,10 @@
-import { getWorks, getCategories } from "./api.js";
+import { store } from "./store.js";
 
 const sectionWorks = document.querySelector(".gallery");
 
-export function afficherWorks(worksFiltrés) {
-    sectionWorks.innerHTML = ""; // Vide la galerie
+// Affichage des projets dans la galerie principale
+export function afficherWorks(worksFiltrés) { // _________________________________________________________________________________ as modifier 
+    sectionWorks.innerHTML = "";
     for (let work of worksFiltrés) {
         const workElement = document.createElement("figure");
         const imageElement = document.createElement("img");
@@ -19,9 +20,15 @@ export function afficherWorks(worksFiltrés) {
     }
 }
 
+// Mise à jour automatique de la galerie quand les données changent dans le store
+store.subscribe(() => {
+    afficherWorks(store.works);// _________________________________________________________________________________ as modifier 
+});
+
 let token = window.sessionStorage.getItem("token");
 console.log("token", token);
 
+// Si connecté, charge le mode admin
 if (token !== null) {
     import("./modal.js").then(module => {
         const { adminMode } = module;
@@ -33,36 +40,34 @@ if (token !== null) {
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-        let works = await getWorks();
-        const categories = await getCategories();
-
-        // Affiche tous les projets au départ
-        afficherWorks(works);
+        await store.getWorks();
+        await store.getCategories();
 
         const sectionPortfolio = document.getElementById("portfolio");
 
-        // Filtres
+        // Création des boutons de filtre
         const filter = document.createElement("div");
         filter.className = "portfolio_filter";
         sectionPortfolio.appendChild(filter);
 
+        // Bouton "Tous"
         const btnTous = document.createElement("button");
         btnTous.textContent = "Tous";
         btnTous.addEventListener("click", (event) => {
             event.preventDefault();
-            afficherWorks(works);
+            afficherWorks(store.works);// _________________________________________________________________________________ as modifier 
         });
         filter.appendChild(btnTous);
 
-        for (let categorie of categories) {
+        // Boutons par catégorie
+        for (let categorie of store.categories) {
             const btnFilter = document.createElement("button");
             btnFilter.textContent = categorie.name;
 
-            btnFilter.addEventListener("click", async (event) => {
+            btnFilter.addEventListener("click", (event) => {
                 event.preventDefault();
-                works = await getWorks();
-                const worksFiltres = works.filter(work => work.categoryId === categorie.id);
-                afficherWorks(worksFiltres);
+                const worksFiltres = store.works.filter(work => work.categoryId === categorie.id);
+                afficherWorks(worksFiltres);// _________________________________________________________________________________ as modifier 
                 console.log("Catégorie sélectionnée :", categorie.name);
             });
 

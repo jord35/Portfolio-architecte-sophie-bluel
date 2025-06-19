@@ -1,8 +1,9 @@
-import { getWorks, getCategories, deleteWork, addWork } from "./api.js";
-import { afficherWorks } from "./script.js";
+// modal
+import { store } from "./store.js";
 
 export async function adminMode() {
-  const categories = await getCategories();
+  await store.getCategories();
+  await store.getWorks();
 
   const modalForAdmin = document.createElement("div");
   modalForAdmin.classList.add("modalForAdmin");
@@ -49,10 +50,7 @@ export async function adminMode() {
     closeModalBtn.addEventListener("click", closeModal);
     modal.querySelector(".js-modal-stop").addEventListener("click", stopPropagation);
 
-    // Charger les projets dans la modale
-    getWorks().then(works => {
-      afficherModalWorks(works);
-    });
+    afficherModalWorks(store.works);
   }
 
   function closeModal(e) {
@@ -64,10 +62,7 @@ export async function adminMode() {
     closeModalBtn.removeEventListener("click", closeModal);
     modal.querySelector(".js-modal-stop").removeEventListener("click", stopPropagation);
 
-    // Recharger les projets dans la galerie principale
-    getWorks().then(nouvellesWorks => {
-      afficherWorks(nouvellesWorks);
-    });
+    store.getWorks();
   }
 
   openModalBtn.addEventListener("click", openModal);
@@ -107,20 +102,7 @@ export async function adminMode() {
       trash.style.cursor = "pointer";
 
       trash.addEventListener("click", async () => {
-        const token = window.sessionStorage.getItem("token");
-
-        if (!token) {
-          alert("Vous devez être connecté pour supprimer une image.");
-          return;
-        }
-        const success = await deleteWork(work.id, token);
-
-        if (success) {
-          workElement.remove();
-        } else {
-          alert("Erreur lors de la suppression de l’image.");
-        }
-
+        await store.removeWork(work.id);
       });
 
       workElement.appendChild(imageElement);
@@ -144,7 +126,7 @@ export async function adminMode() {
       <div>
         <label for="category">Catégorie :</label>
         <select id="category" name="category" required>
-          ${categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join("")}
+          ${store.categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join("")}
         </select>
       </div>
       <button type="submit">Valider</button>
@@ -171,16 +153,13 @@ export async function adminMode() {
     formData.append("title", titleInput.value);
     formData.append("category", categorySelect.value);
 
-    const newWork = await addWork(formData, token);
+    await store.addWork(formData);
+    afficherModalWorks(store.works);
+    form.reset();
+    alert("Image ajoutée avec succès !");
+  });
 
-    if (newWork) {
-      const updatedWorks = await getWorks();
-      afficherModalWorks(updatedWorks);
-      afficherWorks(updatedWorks);
-      form.reset();
-      alert("Image ajoutée avec succès !");
-    } else {
-      alert("Erreur lors de l'ajout de l'image.");
-    }
-  })
+  store.subscribe((state) => {
+    afficherModalWorks(state.works);
+  });
 }

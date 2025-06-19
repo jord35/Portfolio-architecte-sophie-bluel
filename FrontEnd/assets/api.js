@@ -1,3 +1,4 @@
+// api.js
 export async function getWorks() {
     const res = await fetch("http://localhost:5678/api/works");
     return res.json();
@@ -7,6 +8,40 @@ export async function getCategories() {
     const res = await fetch("http://localhost:5678/api/categories");
     return res.json();
 }
+
+
+
+export async function loginUser(password, email) {
+    const login = {
+        email,
+        password,
+    };
+    try {
+        const response = await fetch("http://localhost:5678/api/users/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(login)
+        });
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error("Mot de passe incorrect.");
+            } else if (response.status === 404) {
+                throw new Error("Utilisateur non trouvé.");
+            } else {
+                throw new Error("Erreur lors de la connexion.");
+            }
+        }
+        return response.json();
+    }
+    catch (error) {
+        console.error("Erreur API lors du login :", error);
+        return null;
+    }
+}
+
+
 
 export async function deleteWork(id, token) {
     try {

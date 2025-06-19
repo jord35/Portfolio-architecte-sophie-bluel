@@ -33,7 +33,7 @@ if (token !== null) {
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-        const works = await getWorks();
+        let works = await getWorks();
         const categories = await getCategories();
 
         // Affiche tous les projets au départ
@@ -58,8 +58,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const btnFilter = document.createElement("button");
             btnFilter.textContent = categorie.name;
 
-            btnFilter.addEventListener("click", (event) => {
+            btnFilter.addEventListener("click", async (event) => {
                 event.preventDefault();
+                works = await getWorks();
                 const worksFiltres = works.filter(work => work.categoryId === categorie.id);
                 afficherWorks(worksFiltres);
                 console.log("Catégorie sélectionnée :", categorie.name);

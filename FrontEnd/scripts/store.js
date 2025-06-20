@@ -8,8 +8,11 @@ class Store {
     constructor() {
         this.works = [];
         this.categories = [];
+
         this.subscribers = []; // observers (DOM updates, etc.)
     }
+
+
     // Pour écouter les changements
     subscribe(callback) {
         this.subscribers.push(callback);
@@ -18,6 +21,9 @@ class Store {
     notify() {
         this.subscribers.forEach((fn) => fn(this));
     }
+
+
+    // ______________________________________________
     async getWorks() {
         const success = await Api.getWorks()
         if (!success) {
@@ -27,6 +33,7 @@ class Store {
         this.works = success;
         this.notify();
     }
+    // ______________________________________________
     async getCategories() {
         const success = await Api.getCategories()
         if (!success) {
@@ -37,6 +44,7 @@ class Store {
         this.notify();
 
     }
+    // ______________________________________________
     async removeWork(id) {
         const success = await Api.deleteWork(id, token);
         if (!success) {
@@ -46,6 +54,7 @@ class Store {
         this.works = await Api.getWorks();
         this.notify();
     }
+    // ______________________________________________
     async addWork(formData) {
         const success = await Api.addWork(formData, token);
         if (!success) {

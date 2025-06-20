@@ -1,10 +1,60 @@
 // modal
 import { store } from "./store.js";
+import { renderGallery } from "./gallery.js";
 
 export async function adminMode() {
   await store.getCategories();
   await store.getWorks();
 
+  // function______________________________
+  function openModal(e) {
+    e.preventDefault();
+    modal.style.display = null;
+    modal.removeAttribute("aria-hidden");
+    modal.setAttribute("aria-modal", "true");
+    modal.addEventListener("click", closeModal);
+    closeModalBtn.addEventListener("click", closeModal);
+    modal.querySelector(".js-modal-stop").addEventListener("click", stopPropagation);
+
+    renderModalGallery(store.works);
+  }
+  // ___________________
+  function closeModal(e) {
+    e.preventDefault();
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+    modal.removeAttribute("aria-modal");
+    modal.removeEventListener("click", closeModal);
+    closeModalBtn.removeEventListener("click", closeModal);
+    modal.querySelector(".js-modal-stop").removeEventListener("click", stopPropagation);
+
+    store.getWorks();
+  }
+  // ___________________
+  function renderModalGallery(works) {
+    const container = document.querySelector(".modal-works");
+    renderGallery(works, container);
+
+    const figures = container.querySelectorAll("figure");
+    works.forEach((work, i) => {
+      const figure = figures[i];
+      figure.classList.add("modal-item");
+
+      const img = figure.querySelector("img");
+      img.classList.add("modal-img");
+
+      const trash = document.createElement("i");
+      trash.classList.add("fa-solid", "fa-trash");
+      trash.style.cursor = "pointer";
+
+      trash.addEventListener("click", async () => {
+        await store.removeWork(work.id);
+      });
+
+      figure.appendChild(trash);
+    });
+  }
+  // _______________________________________________
   const modalForAdmin = document.createElement("div");
   modalForAdmin.classList.add("modalForAdmin");
 
@@ -41,30 +91,6 @@ export async function adminMode() {
     e.stopPropagation();
   };
 
-  function openModal(e) {
-    e.preventDefault();
-    modal.style.display = null;
-    modal.removeAttribute("aria-hidden");
-    modal.setAttribute("aria-modal", "true");
-    modal.addEventListener("click", closeModal);
-    closeModalBtn.addEventListener("click", closeModal);
-    modal.querySelector(".js-modal-stop").addEventListener("click", stopPropagation);
-
-    afficherModalWorks(store.works);
-  }
-
-  function closeModal(e) {
-    e.preventDefault();
-    modal.style.display = "none";
-    modal.setAttribute("aria-hidden", "true");
-    modal.removeAttribute("aria-modal");
-    modal.removeEventListener("click", closeModal);
-    closeModalBtn.removeEventListener("click", closeModal);
-    modal.querySelector(".js-modal-stop").removeEventListener("click", stopPropagation);
-
-    store.getWorks();
-  }
-
   openModalBtn.addEventListener("click", openModal);
 
   window.addEventListener("keydown", function (e) {
@@ -85,31 +111,6 @@ export async function adminMode() {
     slideContainer.classList.remove("show-form");
     slideContainer.classList.add("show-gallery");
   });
-
-  function afficherModalWorks(worksFiltrés) {
-    modalWorks.innerHTML = "";
-
-    for (let work of worksFiltrés) {
-      const workElement = document.createElement("figure");
-      const imageElement = document.createElement("img");
-      imageElement.src = work.imageUrl;
-      imageElement.alt = work.title;
-      imageElement.classList.add("modal-img");
-      workElement.classList.add("test");
-
-      const trash = document.createElement("i");
-      trash.classList.add("fa-solid", "fa-trash");
-      trash.style.cursor = "pointer";
-
-      trash.addEventListener("click", async () => {
-        await store.removeWork(work.id);
-      });
-
-      workElement.appendChild(imageElement);
-      workElement.appendChild(trash);
-      modalWorks.appendChild(workElement);
-    }
-  }
 
   const addPicture = modal.querySelector(".js-add-picture");
   addPicture.innerHTML = `
@@ -154,12 +155,12 @@ export async function adminMode() {
     formData.append("category", categorySelect.value);
 
     await store.addWork(formData);
-    afficherModalWorks(store.works);
+    renderModalGallery(store.works);
     form.reset();
     alert("Image ajoutée avec succès !");
   });
 
   store.subscribe((state) => {
-    afficherModalWorks(state.works);
+    renderModalGallery(state.works);
   });
 }

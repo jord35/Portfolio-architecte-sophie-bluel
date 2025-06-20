@@ -1,4 +1,4 @@
-// login_script
+// login
 import { loginUser } from "./api.js";
 
 function userListenerLogin() {

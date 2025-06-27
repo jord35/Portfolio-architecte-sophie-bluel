@@ -9,6 +9,8 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap"
 		rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 	<meta name="description" content="">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
 	<link rel="stylesheet" href="./assets/style.css">
@@ -18,15 +20,18 @@
 
 <body>
 	<header>
-		<h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
-		<nav>
-			<ul>
-				<li>projets</li>
-				<li>contact</li>
-				<li>login</li>
-				<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
-			</ul>
-		</nav>
+		<div id="conteneur_in_header">
+			<h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
+			<nav>
+				<ul>
+					<li>projets</li>
+					<li>contact</li>
+					<li id="login">login</li>
+					<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
+				</ul>
+			</nav>
+		</div>
+
 	</header>
 	<main>
 		<section id="introduction">
@@ -45,7 +50,11 @@
 			</article>
 		</section>
 		<section id="portfolio">
-			<h2>Mes Projets</h2>
+			<!-- zone ou es injecté le code js  -->
+			<div id="js-injectZone">
+				<h2>Mes Projets</h2>
+			</div>
+
 			<div class="gallery">
 
 			</div>

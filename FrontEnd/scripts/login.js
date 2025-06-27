@@ -1,6 +1,9 @@
 // login
 import { loginUser } from "./api.js";
 
+const login = document.getElementById('login');
+login.classList.add('boldLi');
+
 function userListenerLogin() {
     const formulairLogin = document.querySelector(".formulaire-login");
 

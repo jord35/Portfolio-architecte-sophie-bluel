@@ -317,6 +317,7 @@ footer nav ul {
 	align-items: center;
 	gap: 10px;
 	height: 38px;
+	margin-top: 51px;
 
 }
 
@@ -364,26 +365,29 @@ section#portfolio {
 
 .modal-wrapper {
 	overflow-x: hidden;
-	overflow-y: auto;
+	overflow-y: hidden;
 	width: 630px;
 	height: 688px;
 	max-width: calc(100vw - 20px);
 	max-height: calc(100vh - 20px);
 	padding: 20px;
 	background-color: white;
-
+	padding: 0px 30px;
 }
 
 .modal-wrapper h2 {
 	margin-bottom: 46px;
 	font-size: 26px;
+	font-weight: normal;
 	color: #000000;
 }
 
 .modal-wrapper .modal-works {
-	padding: none;
 	grid-column-gap: 9px;
 	grid-row-gap: 29px;
+	padding: 0px;
+	overflow: auto;
+	height: 352px;
 }
 
 /* ________________________ */
@@ -400,10 +404,12 @@ section#portfolio {
 	display: flex;
 	max-height: 100%;
 	width: 50%;
-	padding: 20px;
+	padding: 0px 75px;
 	box-sizing: border-box;
 	flex-direction: column;
 	align-items: center;
+	/* overflow-y: auto; */
+	/* overflow-x: hidden; */
 }
 
 /* État affichant le formulaire */
@@ -432,9 +438,11 @@ button.js-switch-to-gallery:hover {
 
 .modal-works {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(71px, 1fr));
 	gap: 10px;
 	padding: 10px;
+	max-width: calc(71px *5 + 10px *4);
+	width: 100%;
 	align-items: start;
 }
 
@@ -459,6 +467,7 @@ a.js-modal {
 #modal {
 	color: rgb(22, 3, 3);
 	text-decoration: none;
+	overflow: hidden;
 }
 
 .admin_nav {
@@ -493,11 +502,13 @@ a.js-modal {
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	background-color: black;
+	background-color: #000000;
 	position: absolute;
-	right: 1px;
-	top: 1px;
+	right: 5px;
+	top: 6px;
 	padding: 4px;
+	/* width: 17px; */
+	/* height: 17px; */
 }
 
 .modal-item {
@@ -506,6 +517,7 @@ a.js-modal {
 
 .fa-style {
 	color: white;
+	font-size: 9px;
 }
 
 
@@ -514,6 +526,8 @@ a.js-modal {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	margin-top: 26px;
+	margin-bottom: 10px;
 }
 
 .modal-button_conteneur button {
@@ -525,26 +539,24 @@ a.js-modal {
 }
 
 .modal-down-page {
-	margin-top: 50px;
+	margin-top: 67px;
 	display: flex;
-	width: 80%;
-	border-top: solid 1px black;
+	width: 395px;
+	border-top: solid 1px #B3B3B3;
 }
 
 form .modal-down-page {
-	margin-top: 50px;
-	display: flex;
 	width: 100%;
 	flex-direction: column;
 	align-items: center;
-	border-top: solid 1px #B3B3B3;
+
 }
 
 .modal_down_btn {
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
-	margin: 2em auto;
+	margin: 38px auto 45px;
 	width: 237px;
 	text-align: center;
 	border-radius: 60px;
@@ -673,32 +685,27 @@ form .modal-down-page {
 
 }
 
-button#Appartements {
-	min-width: 157px;
+.hidden-upload-elements {
+	display: none;
 }
 
-button#Hotels\ \&\ restaurants {
-	min-width: 198px;
+main {
+	max-width: 1140px;
 }
 
-figcaption {
-	margin: 7px;
-	font-size: 13px;
-	font-weight: 400;
+.body-admin {
+	max-width: 1444px;
 }
 
-.login_footer {
-	margin-top: 355px;
+.padding-admin {
+	padding: 0px 150px;
 }
 
-.admin_margin {
-	margin-bottom: 41px;
+.js-switch-to-gallery .fa-solid {
+	font-weight: 900;
+	font-size: 22px;
 }
 
-i.fa-solid.fa-arrow-left {
-	font-size: 21px;
-}
-
-i.fa-solid.fa-trash.fa-style {
-	font-size: 9px;
+.slide h2 {
+	font-family: 'Work Sans', sans-serif;
 }

@@ -62,6 +62,7 @@ export async function adminMode() {
       // Suppression d'une œuvre
       trash.addEventListener("click", async () => {
         await store.removeWork(work.id);
+        renderModalGallery(store.works);
       });
 
       trashConteneur.appendChild(trash);
@@ -223,9 +224,9 @@ export async function adminMode() {
     reader.onload = () => {
       preview.src = reader.result;
       preview.style.display = "block";
-      dropArea.querySelector("i").style.display = "none";
-      dropArea.querySelector("button").style.display = "none";
-      dropArea.querySelector("p").style.display = "none";
+      dropArea.querySelector("i").classList.add("hidden-upload-elements");
+      dropArea.querySelector("button").classList.add("hidden-upload-elements");
+      dropArea.querySelector("p").classList.add("hidden-upload-elements");
       bttSubmit.classList.add("modal_down_btn--validate-true");
     };
     reader.readAsDataURL(file);
@@ -248,6 +249,10 @@ export async function adminMode() {
     renderModalGallery(store.works);
     form.reset();
     preview.style.display = "none";
+    dropArea.querySelector("i").classList.remove("hidden-upload-elements");
+    dropArea.querySelector("button").classList.remove("hidden-upload-elements");
+    dropArea.querySelector("p").classList.remove("hidden-upload-elements");
+
     bttSubmit.classList.remove("modal_down_btn--validate-true");
     alert("Image ajoutée avec succès !");
   })

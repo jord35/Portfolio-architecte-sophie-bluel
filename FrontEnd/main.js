@@ -6,7 +6,8 @@ import { renderGallery } from "./scripts/gallery.js";
 // __________________________________________________________
 //  zone contenant le code dedié aux differente logique metier 
 
-const link = document.getElementById('login');
+let link = document.getElementById('login');
+link.innerHTML = `login`;
 link.addEventListener("click", (event) => {
     event.preventDefault();
     window.location.href = "login_page.html";
@@ -87,10 +88,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const token = window.sessionStorage.getItem("token");
         console.log("token", token);
+        const body = document.querySelector("body");
+        const conteneurInHeader = document.getElementById('conteneur_in_header')
+        const main = document.querySelector("main");
+
 
         if (token !== null) {
+            body.classList.add("body-admin");
+            conteneurInHeader.classList.add("padding-admin");
+            main.classList.add("padding-admin");
+            link.innerHTML = `logout`;
             // Supprimer les filtres 
             filter.remove();
+
 
             // Ajout de la barre d'édition
             const adminNav = document.createElement("div");

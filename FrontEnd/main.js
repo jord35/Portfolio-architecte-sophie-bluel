@@ -1,4 +1,3 @@
-// __________________________________________________________
 // main.js
 import { store } from "./scripts/store.js";
 import { renderGallery } from "./scripts/gallery.js";

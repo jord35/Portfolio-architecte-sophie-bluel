@@ -1,16 +1,21 @@
 // api.js
+
+
+// permet de recuperer tout les traveaux provenan du serveur -pas besoin de token 
 export async function getWorks() {
     const res = await fetch("http://localhost:5678/api/works");
     return res.json();
 }
 
+// permet de recuperer tout les categorie provenan du serveur -pas besoin de token 
 export async function getCategories() {
     const res = await fetch("http://localhost:5678/api/categories");
     return res.json();
 }
 
 
-
+// permet de recuperer ue token d'autorisation du serveur si condition remplis (email, password)
+// retourne erreure sio non comforme 
 export async function loginUser(password, email) {
     const login = {
         email,
@@ -42,7 +47,7 @@ export async function loginUser(password, email) {
 }
 
 
-
+// permet d'interagire avec les donnée pour suprimé des traveaux sur lke serveur 
 export async function deleteWork(id, token) {
     try {
         const response = await fetch(`http://localhost:5678/api/works/${id}`, {
@@ -62,7 +67,7 @@ export async function deleteWork(id, token) {
         return false;
     }
 }
-
+// permet d'interagire avec les donnée pour ajoute des traveaux sur lke serveur 
 export async function addWork(formData, token) {
     try {
         const response = await fetch("http://localhost:5678/api/works", {

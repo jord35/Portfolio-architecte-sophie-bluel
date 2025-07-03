@@ -35,7 +35,7 @@ export async function adminMode() {
     closeModalBtn.removeEventListener("click", closeModal);
     modal.querySelector(".js-modal-stop").removeEventListener("click", stopPropagation);
 
-    store.getWorks(); // Mise à jour des œuvres après fermeture
+
   }
 
   // === RENDU DES ŒUVRES DANS LA MODALE ===
@@ -153,30 +153,31 @@ export async function adminMode() {
   // === FORMULAIRE D’AJOUT D’IMAGE ===
   const addPicture = modal.querySelector(".js-add-picture");
   addPicture.innerHTML = `
-  <h2>Ajout photo</h2>
-  <form class="js-add-form" enctype="multipart/form-data" id="upload-form">
-    <div id="drop-area">
-      <i class="fa-regular fa-image"></i>
-      <button class="add-button" type="button">+ Ajouter photo</button>
-      <p>jpg, png : 4mo max</p>
-      <input type="file" id="file-input" accept="image/*" hidden />
-      <img id="preview" alt="Aperçu" />
-    </div>
-    <div class="input-conteneur">
-      <label for="title">Titre</label>
-      <input type="text" id="title" name="title" class="input-box" required>
-    </div>
-    <div class="select-wrapper">
-      <label for="category">Catégorie</label>
-      <select id="category" name="category" class="input-box" required>
-        ${store.categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join("")}
-      </select>
-    </div>
-    <div class="modal-down-page">
-      <button type="submit" class="modal_down_btn modal_down_btn--validate">Valider</button>
-    </div>
-  </form>
+<h2>Ajout photo</h2>
+<form class="js-add-form" enctype="multipart/form-data" id="upload-form">
+  <div id="drop-area">
+    <i class="fa-regular fa-image"></i>
+    <button class="add-button" type="button">+ Ajouter photo</button>
+    <p>jpg, png : 4mo max</p>
+    <input type="file" id="file-input" accept="image/*" hidden />
+    <img id="preview" alt="Aperçu" />
+  </div>
+  <div class="input-conteneur">
+    <label for="title">Titre</label>
+    <input type="text" id="title" name="title" class="input-box" required>
+  </div>
+  <div class="select-wrapper">
+    <label for="category">Catégorie</label>
+    <select id="category" name="category" class="input-box" required>
+      ${store.categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join("")}
+    </select>
+  </div>
+  <div class="modal-down-page">
+    <button type="submit" class="modal_down_btn modal_down_btn--validate">Valider</button>
+  </div>
+</form>
 `;
+
   // === SÉLECTEURS ===
   const form = modal.querySelector(".js-add-form");
   const dropArea = form.querySelector("#drop-area");
@@ -184,7 +185,7 @@ export async function adminMode() {
   const preview = form.querySelector("#preview");
   const bttSubmit = form.querySelector(".modal_down_btn");
 
-  // Empêche le comportement par défaut
+  // Empêche le comportement par défaut pour éviter que le navigateur ouvre le fichier
   ["dragover", "drop"].forEach(evt =>
     window.addEventListener(evt, e => e.preventDefault())
   );
@@ -192,31 +193,59 @@ export async function adminMode() {
   // Clique pour ouvrir le file picker
   dropArea.addEventListener("click", () => fileInput.click());
 
-  // Gestion du drag & drop
-  ["dragenter", "dragover"].forEach(event => {
-    dropArea.addEventListener(event, e => {
-      e.preventDefault();
-      dropArea.classList.add("hover");
-    });
-  });
-  ["dragleave", "drop"].forEach(event => {
-    dropArea.addEventListener(event, e => {
-      e.preventDefault();
-      dropArea.classList.remove("hover");
-    });
+
+  // _______________________________________________
+  // Gestion du drag & drop avec compteur pour éviter
+  // que le hover disparaisse quand on passe sur un enfant.
+  // dragCounter compte le nombre d'éléments survolés.
+
+  // Quand on entre dans dropArea (ou un de ses enfants), on incrémente
+  // et on ajoute la classe hover.
+  let dragCounter = 0;
+
+  dropArea.addEventListener("dragenter", e => {
+    e.preventDefault();
+    dragCounter++;
+    dropArea.classList.add("hover");
   });
 
-  // Récupère le fichier déposé ou sélectionné
+  // Quand on sort d'un élément (dropArea ou enfant), on décrémente
+  // Si on est plus du tout dans dropArea (dragCounter === 0), on retire la classe hover.
+  dropArea.addEventListener("dragleave", e => {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter === 0) {
+      dropArea.classList.remove("hover");
+    }
+  });
+
+  // On empêche le comportement par défaut pour autoriser le drop.
+  dropArea.addEventListener("dragover", e => {
+    e.preventDefault();
+  });
+
+  // Quand on lâche le fichier, on remet dragCounter à 0
+  // et on retire la classe hover pour remettre l'état normal.
   dropArea.addEventListener("drop", e => {
+    e.preventDefault();
+    dragCounter = 0;
+    dropArea.classList.remove("hover");
+
+    // _______________________________________________
+
+
+    // Récupère le fichier déposé
     const file = e.dataTransfer.files[0];
     handleFile(file);
   });
+
+  // Gestion du changement du file input (par clic)
   fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
     handleFile(file);
   });
 
-  // Aperçu image + stockage dans input
+  // Aperçu image + mise à jour du formulaire
   function handleFile(file) {
     if (!file || !file.type.startsWith("image/")) return;
 
@@ -235,6 +264,8 @@ export async function adminMode() {
     dataTransfer.items.add(file);
     fileInput.files = dataTransfer.files;
   }
+
+  // Envoi du formulaire d'ajout
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const token = window.sessionStorage.getItem("token");
@@ -247,8 +278,11 @@ export async function adminMode() {
 
     await store.addWork(formData);
     renderModalGallery(store.works);
+
     form.reset();
+    // Remet l'aperçu de l'image à invisible
     preview.style.display = "none";
+    //  Affiche à nouveau les éléments cachés du drop area (icône, bouton, texte)
     dropArea.querySelector("i").classList.remove("hidden-upload-elements");
     dropArea.querySelector("button").classList.remove("hidden-upload-elements");
     dropArea.querySelector("p").classList.remove("hidden-upload-elements");

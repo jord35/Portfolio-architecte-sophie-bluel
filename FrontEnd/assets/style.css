@@ -317,7 +317,7 @@ footer nav ul {
 	align-items: center;
 	gap: 10px;
 	height: 38px;
-	margin-top: 51px;
+	margin-top: 45px;
 
 }
 
@@ -451,6 +451,7 @@ button.js-switch-to-gallery:hover {
 	align-items: center;
 	justify-content: center;
 	gap: 31px;
+	margin-bottom: 6px;
 }
 
 a.js-modal {
@@ -487,7 +488,7 @@ a.js-modal {
 .header_admin {
 	display: flex;
 	flex-direction: column;
-	margin: 0px 0px 50px 0px;
+	margin: 0px 0px 95px 0px;
 }
 
 #conteneur_in_header {
